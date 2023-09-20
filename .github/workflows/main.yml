@@ -37,7 +37,10 @@ jobs:
           fi
 
           echo "XGUARDIAN_TOKEN=$TOKEN" >> $GITHUB_ENV
-
+      - name: Debug secretss
+        run: |
+          echo "XGUARDIAN_EMAIL=${{ secrets.XGUARDIAN_EMAIL }}"
+          echo "XGUARDIAN_PASSWORD=${{ secrets.XGUARDIAN_PASSWORD }}"
       - name: Create App
         run: |
           APP_ID=$(curl -sS -X POST 'https://uploader-mvp.xguardianplatform.io/create_app' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{
