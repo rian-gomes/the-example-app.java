@@ -9,19 +9,27 @@ jobs:
   login_and_store_token:
     runs-on: ubuntu-latest
 
+    env:
+      API_EMAIL: ${{ secrets.API_EMAIL }}
+      API_PASSWORD: ${{ secrets.API_PASSWORD }}
+      GH_TOKEN: ${{ secrets.GIT_TOKEN }} # Defina o token de acesso do GitHub como uma variável de ambiente
+
     steps:
     - name: Verificar código
       uses: actions/checkout@v2
 
-    - name: Instalar jq
+    - name: Instalar GitHub CLI
       run: |
-        sudo apt-get update -y
-        sudo apt-get install jq -y
+        # Instalação do GitHub CLI
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+        sudo apt-add-repository https://cli.github.com/packages
+        sudo apt-get update
+        sudo apt-get install gh -y
+
+    - name: Fazer login no GitHub CLI
+      run: gh auth login --with-token <<<"${GH_TOKEN}"
 
     - name: Fazer login na API e armazenar token
-      env:
-        API_EMAIL: ${{ secrets.API_EMAIL }}
-        API_PASSWORD: ${{ secrets.API_PASSWORD }}
       run: |
         # Faz o login na API usando as variáveis de ambiente API_EMAIL e API_PASSWORD
         response=$(curl -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
@@ -32,8 +40,8 @@ jobs:
             "password": "'"${API_PASSWORD}"'"
           }' | jq -r '.token')
 
-        # Armazena o token como um segredo no GitHub Actions
-        echo -n "$response" | gh secret set API_TOKEN
+        # Armazena o token como um segredo no GitHub Actions usando echo e gh
+        echo -n "$response" | gh secret set API_TOKEN -
 
         # Limpa a variável temporária que continha o token
         unset response
