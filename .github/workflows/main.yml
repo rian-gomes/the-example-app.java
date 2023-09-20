@@ -11,18 +11,17 @@ jobs:
 
     strategy:
       matrix:
-        lang: [python, java]
+        lang: [python]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python and Java
+      - name: Set up Python
         run: |
-          sudo apt-get install -y python3 openjdk-11-jdk
+          sudo apt-get install -y python3
           echo "python=python3" >> $GITHUB_ENV
-          echo "java=openjdk-11-jdk" >> $GITHUB_ENV
-
+          
       - name: Login to XGuardian
         run: |
           RESPONSE=$(curl -sS -X POST 'https://auth.xguardianplatform.io/login' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{
