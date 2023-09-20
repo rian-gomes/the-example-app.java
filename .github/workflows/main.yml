@@ -13,6 +13,11 @@ jobs:
     - name: Verificar código
       uses: actions/checkout@v2
 
+    - name: Instalar jq
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install jq -y
+
     - name: Fazer login na API e armazenar token
       env:
         API_EMAIL: ${{ secrets.API_EMAIL }}
