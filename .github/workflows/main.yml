@@ -1,84 +1,28 @@
-name: XGuardian SAST Scan
+name: Login na API
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
-  scan:
+  login:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        lang: [python, java]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Verificar código
+      uses: actions/checkout@v2
 
-      - name: Set up Python and Java
-        run: |
-          sudo apt-get install -y python3 openjdk-11-jdk
-          echo "python=python3" >> $GITHUB_ENV
-          echo "java=openjdk-11-jdk" >> $GITHUB_ENV
-
-      - name: Login to XGuardian
-        run: |
-          RESPONSE=$(curl -sS -X POST 'https://auth.xguardianplatform.io/login' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{
-            "email": "${{ secrets.XGUARDIAN_EMAIL }}",
-            "password": "${{ secrets.XGUARDIAN_PASSWORD }}"
-          }')
-
-          TOKEN=$(echo "$RESPONSE" | jq -r '.token')
-          if [ -z "$TOKEN" ]; then
-            echo "XGuardian API error: Failed to extract token from API response."
-            exit 1
-          fi
-
-          echo "XGUARDIAN_TOKEN=$TOKEN" >> $GITHUB_ENV
-      - name: Debug secretss
-        run: |
-          echo "XGUARDIAN_EMAIL=${{ secrets.XGUARDIAN_EMAIL }}"
-          echo "XGUARDIAN_PASSWORD=${{ secrets.XGUARDIAN_PASSWORD }}"
-      - name: Create App
-        run: |
-          APP_ID=$(curl -sS -X POST 'https://uploader-mvp.xguardianplatform.io/create_app' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{
-            "token": "${{ env.XGUARDIAN_TOKEN }}",
-            "app_name": "${{ env.APP_NAME }}",
-            "team_id": ${{ env.TEAM_ID }},
-            "languages": ["${{ env.LANGUAGES }}"],
-            "description": "${{ env.DESCRIPTION }}"
-          }' | jq -r '.app_id')
-
-          if [ -z "$APP_ID" ]; then
-            echo "XGuardian API error: Failed to create the app."
-            exit 1
-          fi
-
-          echo "XGUARDIAN_APP_ID=$APP_ID" >> $GITHUB_ENV
-
-      - name: Generate Upload URL
-        run: |
-          URL=$(curl -sS -X POST 'https://uploader-mvp.xguardianplatform.io/upload-url' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{
-            "token": "${{ env.XGUARDIAN_TOKEN }}",
-            "app_id": ${{ env.XGUARDIAN_APP_ID }},
-            "scan_version": "${{ env.SCAN_VERSION }}",
-            "file_type": "${{ env.FILE_TYPE }}"
-          }' | jq -r '.url')
-
-          if [ -z "$URL" ]; then
-            echo "XGuardian API error: Failed to generate upload URL."
-            exit 1
-          fi
-
-          echo "XGUARDIAN_UPLOAD_URL=$URL" >> $GITHUB_ENV
-
-      # ... Rest of your workflow steps ...
-
-      - name: Upload application for scan
-        run: |
-          FILE_PATH="./WebGoat/webgoat.zip"
-          curl --progress-bar --location --request PUT "${{ env.XGUARDIAN_UPLOAD_URL }}" \
-            --header 'Content-Type: application/zip' \
-            --data-binary "@${FILE_PATH}"
+    - name: Fazer login na API
+      env:
+        API_EMAIL: ${{ secrets.API_EMAIL }}
+        API_PASSWORD: ${{ secrets.API_PASSWORD }}
+      run: |
+        # Faz o login na API usando as variáveis de ambiente API_EMAIL e API_PASSWORD
+        curl -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "email": "'"${API_EMAIL}"'",
+            "password": "'"${API_PASSWORD}"'"
+          }'
