@@ -19,10 +19,11 @@ jobs:
         API_PASSWORD: ${{ secrets.API_PASSWORD }}
       run: |
         # Faz o login na API usando as variáveis de ambiente API_EMAIL e API_PASSWORD
-        curl -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
+        response=$(curl -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
           -H 'accept: application/json' \
           -H 'Content-Type: application/json' \
           -d '{
             "email": "'"${API_EMAIL}"'",
             "password": "'"${API_PASSWORD}"'"
-          }'
+          }' | jq -r '.token')
+          echo "$response" | tr -d '\n' | xargs -0 echo -n | gh secret set API_TOKEN -
