@@ -3,7 +3,7 @@ name: XGuardian SAST Scan
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   scan:
