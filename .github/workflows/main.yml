@@ -3,7 +3,7 @@ name: Login na API
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   login:
