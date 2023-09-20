@@ -33,7 +33,7 @@ jobs:
           }' | jq -r '.token')
 
         # Armazena o token como um segredo no GitHub Actions
-        echo -n "$response" | gh secret set API_TOKEN -
+        echo -n "$response" | gh secret set API_TOKEN
 
         # Limpa a variável temporária que continha o token
         unset response
