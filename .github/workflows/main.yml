@@ -65,9 +65,8 @@ jobs:
         if [ "$HTTP_STATUS" == "200" ]; then
           echo "Aplicação criada com sucesso!"
         elif [ "$HTTP_STATUS" == "400" ]; then
-          if echo "$RESPONSE" | grep -q "Aplicação já existe"; then
-            echo "Erro: A aplicação com o mesmo nome já existe."
-            # Tratar o caso em que a aplicação já existe
+          if [[ "$RESPONSE" =~ "Aplicação já existe!" ]]; then
+            echo "A aplicação já existe, prosseguindo com o fluxo de trabalho."
           else
             echo "Erro desconhecido: Código de status HTTP 400"
             # Tratar outros erros 400, se necessário
