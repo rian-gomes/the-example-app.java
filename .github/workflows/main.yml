@@ -69,6 +69,3 @@ jobs:
         else
           echo "O código de status HTTP é 400 (Bad Request). A aplicação já existe."
         fi
-          echo "O código de status HTTP é $HTTP_STATUS."
-          echo "A aplicação já existe ou ocorreu um erro desconhecido. Continuando o fluxo de trabalho."
-        fi
