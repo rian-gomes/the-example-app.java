@@ -51,7 +51,7 @@ jobs:
           "app_name": "'"${APP_NAME}"'",
           "team_id": "'"${TEAM_ID}"'",
           "languages": ["java"],
-          "description": "teste",
+          "description": "string",
           "policy": 1
         }'
 
@@ -65,8 +65,13 @@ jobs:
         if [ "$HTTP_STATUS" == "200" ]; then
           echo "Aplicação criada com sucesso!"
         elif [ "$HTTP_STATUS" == "400" ]; then
-          echo "Erro: A aplicação com o mesmo nome já existe."
-          # Tratar erro 400 conforme necessário
+          if echo "$RESPONSE" | grep -q "Aplicação já existe"; then
+            echo "Erro: A aplicação com o mesmo nome já existe."
+            # Tratar o caso em que a aplicação já existe
+          else
+            echo "Erro desconhecido: Código de status HTTP 400"
+            # Tratar outros erros 400, se necessário
+          fi
         else
           echo "Erro desconhecido: Código de status HTTP $HTTP_STATUS"
           # Tratar outros erros de código de status, se necessário
