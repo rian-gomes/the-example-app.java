@@ -44,7 +44,7 @@ jobs:
     - name: Verificar e criar aplicação
       run: |
         # Endpoint da API para verificar e criar aplicação
-        VERIFY_CREATE_APP_URL="https://uploader-mvp.xguardianplatform.io/create_app"
+        VERIFY_CREATE_APP_URL="https://uploader-mvp.development.xguardianplatform.io/create_app"
 
         DATA='{
           "token": "'"${API_TOKEN}"'",
