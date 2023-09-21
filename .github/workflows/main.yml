@@ -61,12 +61,14 @@ jobs:
           -d "${DATA}")
 
         HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+        # Extrair o código de status "400" usando jq
+        HTTP_STATUS_400=$(echo "$HTTP_STATUS" | jq '. | select(. == 400)')
 
-        if [ -z "$HTTP_STATUS" ]; then
-          echo "Erro desconhecido: Não foi possível obter o código de status HTTP."
-        elif [ "$HTTP_STATUS" == "200" ]; then
-          echo "Aplicação criada com sucesso!"
+        if [ -z "$HTTP_STATUS_400" ]; then
+          echo "Erro desconhecido: Não foi possível obter o código de status 400."
         else
+          echo "O código de status HTTP é 400 (Bad Request). A aplicação já existe."
+        fi
           echo "O código de status HTTP é $HTTP_STATUS."
           echo "A aplicação já existe ou ocorreu um erro desconhecido. Continuando o fluxo de trabalho."
         fi
