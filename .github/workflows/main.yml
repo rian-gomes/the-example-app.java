@@ -16,22 +16,13 @@ jobs:
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
       APP_NAME: ${{ github.event.repository.name }} # Definir o nome da aplicação como o nome do repositório GitHub
       TEAM_ID: 370
-      SCAN_VERSION: ${{ github.event.inputs.scan_version }}
+      SCAN_VERSION: 1.0
       FILE_TYPE: "application/zip"
 
     steps:
     - name: Verificar código
       uses: actions/checkout@v2
       
-    - name: Criar lançamento
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: ""
-        tag_name: v${{ env.SCAN_VERSION }}
-        release_name: Release v${{ env.SCAN_VERSION }}
-        prerelease: false
-        draft: false
     - name: Fazer login na API e armazenar token
       run: |
         # Faz o login na API usando as variáveis de ambiente API_EMAIL e API_PASSWORD
@@ -80,6 +71,7 @@ jobs:
         else
           echo "O código de status HTTP é 400 (Bad Request). A aplicação já existe."
         fi
+
     - name: Fazer a requisição GET para obter aplicação
       run: |
         RESPONSE=$(curl -sS -X GET \
@@ -113,3 +105,15 @@ jobs:
             "scan_version": "'"${SCAN_VERSION}"'",
             "file_type": "'"${FILE_TYPE}"'"
           }' | jq -r '.url')
+
+    - name: Zip files
+      run: |
+        zip -r "${APP_NAME}.zip" .
+        
+    - name: Upload da aplicação para o scan
+      run: |
+        filePath="./${{ env.APP_NAME }}.zip"
+        
+        curl --progress-bar --location --request PUT "${{ env.UPLOAD_URL }}" \
+          --header 'Content-Type: application/zip' \
+          --data-binary "@${filePath}"
