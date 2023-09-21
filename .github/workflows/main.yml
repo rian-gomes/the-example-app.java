@@ -14,7 +14,7 @@ jobs:
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
       API_TOKEN: ${{ secrets.API_TOKEN }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
-      APP_NAME: "TESTE" # Definir o nome da aplicação como o nome do repositório GitHub
+      APP_NAME: ${{ github.event.repository.name }} # Definir o nome da aplicação como o nome do repositório GitHub
       TEAM_ID: 370
 
     steps:
@@ -69,3 +69,24 @@ jobs:
         else
           echo "O código de status HTTP é 400 (Bad Request). A aplicação já existe."
         fi
+    - name: Fazer a requisição GET para obter aplicação
+      run: |
+        RESPONSE=$(curl -sS -X GET \
+          'https://uploader-mvp.development.xguardianplatform.io/get_apps?token='"${API_TOKEN}"'' \
+          -H 'accept: application/json')
+
+        # Analisar a resposta JSON em busca do APP_NAME
+        APP_ID=$(echo "$RESPONSE" | jq -r '.[] | select(.name == "'"${APP_NAME}"'") | .id')
+
+        if [ -z "$APP_ID" ]; then
+          echo "Aplicação com nome '${APP_NAME}' não encontrada."
+          exit 1
+        fi
+
+        echo "ID da aplicação: $APP_ID"
+        echo "::set-env name=APP_ID::$APP_ID"
+    
+    - name: Usar o ID da aplicação em outro passo
+      run: |
+        echo "ID da aplicação obtido: $APP_ID"
+        # Você pode usar a variável $APP_ID em outros passos deste trabalho
