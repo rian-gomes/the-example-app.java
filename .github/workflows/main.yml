@@ -1,4 +1,4 @@
-name: Login na API e Armazenar Token
+name: Login na API, Armazenar Token e Verificar/Criar Aplicação
 
 on:
   push:
@@ -6,13 +6,15 @@ on:
       - master
 
 jobs:
-  login_and_store_token:
+  login_and_create_app:
     runs-on: ubuntu-latest
 
     env:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
+      APP_NAME: ${{ github.repository_name }} 
+      TEAM_ID: 370
 
     steps:
     - name: Verificar código
@@ -29,8 +31,59 @@ jobs:
             "password": "'"${API_PASSWORD}"'"
           }' | jq -r '.token')
 
-        # Armazena o token como um segredo no GitHub Actions usando echo e gh
-        echo -n "$response" | gh secret set API_TOKEN
+        # Verifica o código de status HTTP da resposta
+        http_status=$(curl -sw "%{http_code}" -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "email": "'"${API_EMAIL}"'",
+            "password": "'"${API_PASSWORD}"'"
+          }')
+
+        if [ "$http_status" == "200" ]; then
+          # Armazena o token como um segredo no GitHub Actions usando echo e gh
+          echo -n "$response" | gh secret set API_TOKEN
+          echo "Token armazenado com sucesso."
+        elif [ "$http_status" == "400" ]; then
+          echo "Erro: Já existe um problema com suas credenciais."
+          # Tratar erro 400 como necessário
+          exit 1 # Se desejar encerrar o fluxo em caso de erro 400
+        else
+          echo "Erro desconhecido: Código de status HTTP $http_status"
+          # Tratar outros erros de código de status, se necessário
+          exit 1 # Se desejar encerrar o fluxo em caso de outros erros
+        fi
 
         # Limpa a variável temporária que continha o token
         unset response
+
+    - name: Verificar e criar aplicação
+      run: |
+        # Endpoint da API para verificar e criar aplicação
+        VERIFY_CREATE_APP_URL="https://uploader-mvp.development.xguardianplatform.io/verify_create_app"
+
+        DATA='{
+          "token": "'"${API_TOKEN}"'",
+          "app_name": "'"${APP_NAME}"'",
+          "team_id": "'"${TEAM_ID}"'",
+          "languages": ["java"],
+          "description": "string",
+          "policy": 1
+        }'
+
+        RESPONSE=$(curl -sS -w "%{http_code}" -X POST "${VERIFY_CREATE_APP_URL}" \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d "${DATA}")
+
+        HTTP_STATUS=$(echo "${RESPONSE}" | tail -n1)
+
+        if [ "$HTTP_STATUS" == "200" ]; then
+          echo "Aplicação verificada e criada com sucesso!"
+        elif [ "$HTTP_STATUS" == "400" ]; then
+          echo "Erro: A aplicação com o mesmo nome já existe."
+          # Tratar erro 400 como necessário
+        else
+          echo "Erro desconhecido: Código de status HTTP $HTTP_STATUS"
+          # Tratar outros erros de código de status, se necessário
+        fi
