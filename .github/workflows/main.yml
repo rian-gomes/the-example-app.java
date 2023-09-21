@@ -12,7 +12,7 @@ jobs:
     env:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITH_TOKEN }}
 
     steps:
     - name: Verificar código
