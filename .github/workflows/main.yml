@@ -16,11 +16,22 @@ jobs:
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
       APP_NAME: ${{ github.event.repository.name }} # Definir o nome da aplicação como o nome do repositório GitHub
       TEAM_ID: 370
+      SCAN_VERSION: ${{ github.event.inputs.scan_version }}
+      FILE_TYPE: "application/zip"
 
     steps:
     - name: Verificar código
       uses: actions/checkout@v2
-
+      
+    - name: Criar lançamento
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ""
+        tag_name: v${{ env.SCAN_VERSION }}
+        release_name: Release v${{ env.SCAN_VERSION }}
+        prerelease: false
+        draft: false
     - name: Fazer login na API e armazenar token
       run: |
         # Faz o login na API usando as variáveis de ambiente API_EMAIL e API_PASSWORD
@@ -90,3 +101,15 @@ jobs:
       run: |
         echo "ID da aplicação obtido: $APP_ID"
         # Você pode usar a variável $APP_ID em outros passos deste trabalho
+        
+    - name: Obter URL de upload
+      run: |
+        UPLOAD_URL=$(curl -sS -X POST 'https://uploader-mvp.development.xguardianplatform.io/upload-url' \
+          -H 'accept: application/json' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "token": "'"${API_TOKEN}"'",
+            "app_id": "'"${APP_ID}"'",
+            "scan_version": "'"${SCAN_VERSION}"'",
+            "file_type": "'"${FILE_TYPE}"'"
+          }' | jq -r '.url')
