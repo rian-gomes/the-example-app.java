@@ -13,7 +13,7 @@ jobs:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
-      APP_NAME: ${{ github.repository_name }} # Usar o nome do repositório como nome da aplicação
+      APP_NAME: ${{ github.repository_name }} # Definir o nome da aplicação como o nome do repositório GitHub
       TEAM_ID: 370
 
     steps:
