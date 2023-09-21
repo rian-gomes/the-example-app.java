@@ -13,7 +13,7 @@ jobs:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
-      APP_NAME: ${{ github.repository_name }} 
+      APP_NAME: ${{ github.repository_name }} # Substitua pelo nome desejado
       TEAM_ID: 370
 
     steps:
@@ -38,7 +38,7 @@ jobs:
           -d '{
             "email": "'"${API_EMAIL}"'",
             "password": "'"${API_PASSWORD}"'"
-          }')
+          }' | tail -n1)
 
         if [ "$http_status" == "200" ]; then
           # Armazena o token como um segredo no GitHub Actions usando echo e gh
@@ -76,7 +76,7 @@ jobs:
           -H 'Content-Type: application/json' \
           -d "${DATA}")
 
-        HTTP_STATUS=$(echo "${RESPONSE}" | tail -n1)
+        HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
 
         if [ "$HTTP_STATUS" == "200" ]; then
           echo "Aplicação verificada e criada com sucesso!"
