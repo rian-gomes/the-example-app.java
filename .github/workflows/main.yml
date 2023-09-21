@@ -84,8 +84,8 @@ jobs:
         fi
 
         echo "ID da aplicação: $APP_ID"
-        echo "::set-env name=APP_ID::$APP_ID"
-    
+        echo "APP_ID=$APP_ID" >> $GITHUB_ENV # Definir a variável de ambiente corretamente
+
     - name: Usar o ID da aplicação em outro passo
       run: |
         echo "ID da aplicação obtido: $APP_ID"
