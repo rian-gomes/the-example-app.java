@@ -12,14 +12,11 @@ jobs:
     env:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
-      GH_TOKEN: ${{ secrets.GITH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GIT_TOKEN }}
 
     steps:
     - name: Verificar código
       uses: actions/checkout@v2
-
-    - name: Fazer login no GitHub CLI
-      run: gh auth login --with-token <<<"${GH_TOKEN}"
 
     - name: Fazer login na API e armazenar token
       run: |
