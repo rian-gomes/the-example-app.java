@@ -13,7 +13,7 @@ jobs:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
-      APP_NAME: ${{ github.repository_name }} # Substitua pelo nome desejado
+      APP_NAME: ${{ github.repository_name }} # Usar o nome do repositório como nome da aplicação
       TEAM_ID: 370
 
     steps:
@@ -31,31 +31,15 @@ jobs:
             "password": "'"${API_PASSWORD}"'"
           }' | jq -r '.token')
 
-        # Verifica o código de status HTTP da resposta
-        http_status=$(curl -sw "%{http_code}" -X 'POST' 'https://auth.development.xguardianplatform.io/login' \
-          -H 'accept: application/json' \
-          -H 'Content-Type: application/json' \
-          -d '{
-            "email": "'"${API_EMAIL}"'",
-            "password": "'"${API_PASSWORD}"'"
-          }' | tail -n1)
-
-        if [ "$http_status" == "200" ]; then
+        # Verifica se o token foi obtido com sucesso
+        if [ -n "$response" ] && [ "$response" != "null" ]; then
           # Armazena o token como um segredo no GitHub Actions usando echo e gh
           echo -n "$response" | gh secret set API_TOKEN
           echo "Token armazenado com sucesso."
-        elif [ "$http_status" == "400" ]; then
-          echo "Erro: Já existe um problema com suas credenciais."
-          # Tratar erro 400 como necessário
-          exit 1 # Se desejar encerrar o fluxo em caso de erro 400
         else
-          echo "Erro desconhecido: Código de status HTTP $http_status"
-          # Tratar outros erros de código de status, se necessário
-          exit 1 # Se desejar encerrar o fluxo em caso de outros erros
+          echo "Erro: Não foi possível obter o token de autenticação."
+          exit 1
         fi
-
-        # Limpa a variável temporária que continha o token
-        unset response
 
     - name: Verificar e criar aplicação
       run: |
