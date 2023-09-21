@@ -43,31 +43,29 @@ jobs:
 
     - name: Verificar e criar aplicação
       run: |
-        # Endpoint da API para verificar e criar aplicação
-        VERIFY_CREATE_APP_URL="https://uploader-mvp.development.xguardianplatform.io/create_app"
+        CREATE_APP_URL="https://uploader-mvp.development.xguardianplatform.io/create_app"
 
         DATA='{
           "token": "'"${API_TOKEN}"'",
           "app_name": "'"${APP_NAME}"'",
           "team_id": "'"${TEAM_ID}"'",
           "languages": ["java"],
-          "description": "string",
+          "description": "teste",
           "policy": 1
         }'
 
-        RESPONSE=$(curl -sS -w "%{http_code}" -X POST "${VERIFY_CREATE_APP_URL}" \
+        RESPONSE=$(curl -sS -w "%{http_code}" -X POST "${CREATE_APP_URL}" \
           -H 'accept: application/json' \
           -H 'Content-Type: application/json' \
           -d "${DATA}")
 
         HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
-        echo "$RESPONSE"
 
         if [ "$HTTP_STATUS" == "200" ]; then
-          echo "Aplicação verificada e criada com sucesso!"
+          echo "Aplicação criada com sucesso!"
         elif [ "$HTTP_STATUS" == "400" ]; then
           echo "Erro: A aplicação com o mesmo nome já existe."
-          # Tratar erro 400 como necessário
+          # Tratar erro 400 conforme necessário
         else
           echo "Erro desconhecido: Código de status HTTP $HTTP_STATUS"
           # Tratar outros erros de código de status, se necessário
