@@ -12,6 +12,7 @@ jobs:
     env:
       API_EMAIL: ${{ secrets.API_EMAIL }}
       API_PASSWORD: ${{ secrets.API_PASSWORD }}
+      API_TOKEN: ${{ secrets.API_TOKEN }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
       APP_NAME: "TESTE" # Definir o nome da aplicação como o nome do repositório GitHub
       TEAM_ID: 370
