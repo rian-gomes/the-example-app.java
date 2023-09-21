@@ -103,7 +103,9 @@ jobs:
             "token": "'"${API_TOKEN}"'",
             "app_id": "'"${APP_ID}"'",
             "scan_version": "'"${SCAN_VERSION}"'",
-            "file_type": "'"${FILE_TYPE}"'"
+            "file_type": "'"${FILE_TYPE}"'",
+            "sca": "1", 
+            "sast": "1" 
           }' | jq -r '.url')
 
     - name: Zip files
