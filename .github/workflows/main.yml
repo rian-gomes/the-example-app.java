@@ -107,6 +107,8 @@ jobs:
             "sca": "1", 
             "sast": "1" 
           }' | jq -r '.url')
+          echo "URL de Upload: ${RESPONSE}"
+          UPLOAD_URL="${RESPONSE}"
 
     - name: Zip files
       run: |
