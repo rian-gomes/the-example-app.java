@@ -105,8 +105,8 @@ jobs:
             "app_id": "'"${APP_ID}"'",
             "scan_version": "'"${SCAN_VERSION}"'",
             "file_type": "'"${FILE_TYPE}"'",
-            "sca": "1", 
-            "sast": "1" 
+            "sca": "true", 
+            "sast": "true" 
           }' | jq -r '.url')
           echo "URL de Upload: ${UPLOAD_URL}"
           echo "UPLOAD_URL=${UPLOAD_URL}" >> $GITHUB_ENV
