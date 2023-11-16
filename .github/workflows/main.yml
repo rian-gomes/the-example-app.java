@@ -15,7 +15,7 @@ jobs:
       API_TOKEN: ${{ secrets.API_TOKEN }}
       GH_TOKEN: ${{ secrets.GIT_TOKEN }}
       APP_NAME: ${{ github.event.repository.name }} # Definir o nome da aplicação como o nome do repositório GitHub
-      TEAM_ID: 370
+      TEAM_ID: 670
       SCAN_VERSION: '1.2'
       FILE_TYPE: "application/zip"
       UPLOAD_URL: "teste"
